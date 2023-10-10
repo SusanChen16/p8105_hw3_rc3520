@@ -2,11 +2,12 @@
 title: "p8105_hw3_rc3520"
 author: "Ruyi Chen"
 date: "2023-10-10"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library (tidyverse)
+library(ggridges)
 ```
 
 ## R Markdown
@@ -20,5 +21,36 @@ devtools::install_github("p8105/p8105.datasets")
 ```{r}
 library(p8105.datasets)
 data("instacart")
+```
+
+## Look at data summary
+```{r}
+str(instacart)
+skimr::skim(instacart)
+```
+## Data Description:
+The dataset 'instacart' includes `r nrow(instacart)` observations and `r ncol(instacart)` variables which includes 
+## Answer the following questions
+### 1. How many aisles are there, and which aisles are the most items ordered from?
+```{r}
+instacart |>
+  count(aisle) |>
+  arrange(desc(n))
+```
+### There are 124 aisles; most items are ordered from fresh vegetables and fresh fruits.
+
+### 2. Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
+```{r}
+instacart_aisle= 
+  instacart |>
+  count(aisle)|>
+  filter(n > 10000)|>
+  select(aisle,n) 
+
+ggp_aisle=
+  ggplot(instacart_aisle, aes(x = aisle, y = n)) + 
+  geom_point()+ 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggp_aisle
 ```
 

@@ -12,10 +12,6 @@ library(ggridges)
 
 ## R Markdown
 #Problem 1
-## install.packages("devtools")
-```{r}
-devtools::install_github("p8105/p8105.datasets")
-```
 
 ##load the data from p8105.datasets
 ```{r}

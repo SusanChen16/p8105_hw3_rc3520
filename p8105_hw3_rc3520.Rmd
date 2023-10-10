@@ -1,0 +1,24 @@
+---
+title: "p8105_hw3_rc3520"
+author: "Ruyi Chen"
+date: "2023-10-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+#Problem 1
+## install.packages("devtools")
+```{r}
+devtools::install_github("p8105/p8105.datasets")
+```
+
+##load the data from p8105.datasets
+```{r}
+library(p8105.datasets)
+data("instacart")
+```
+

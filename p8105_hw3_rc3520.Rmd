@@ -120,9 +120,9 @@ brfss |>
   summarise(count_locations = n_distinct(locationdesc)) |>
   filter(count_locations >= 7)
 ```
-### 3. Construct a dataset that is limited to Excellent responses, and contains, year, state, and a variable that averages the data_value across locations within a state. Make a “spaghetti” plot of this average value over time within a state (that is, make a plot showing a line for each state across years – the geom_line geometry and group aesthetic will help).
+### 3. Comment:this is a spaghetti plot illustrating the average data_value over time for 'Excellent' responses within each state across years. A glimpse of observation suggests a consistent trend across various states. Nevertheless, the multitude of overlapping lines representing each state creates a density that makes it difficult to distinguish them from one another.
 ```{r}
-# Construct a dataset
+# Construct a data set that is limited to Excellent responses, and contains, year, state, and a variable that averages the data_value across locations within a state.
 brfss_excellent =
   brfss |>
   filter(response %in% c("Excellent"))|>
@@ -131,7 +131,7 @@ brfss_excellent =
 ```
 
 ```{r}
-#Make a plot
+#Make a plot showing a line for each state across years
 ggp_brfss_excellent =
   brfss_excellent |>
   ggplot(aes(x = year, y = ave_data_value, group = locationabbr, color = locationabbr)) + 
@@ -144,18 +144,20 @@ ggp_brfss_excellent =
 ggp_brfss_excellent
 ```
 
-### 4. Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
+### 4.Comment:this two-panel plot shoes that in year 2006 and 2010, the distribution medians of data value in different response group rank consistently. The highest to lowest medians ranking is: very good, good, excelent, fair and poor. However, the spread of data value for good response group became more condensed in 2010; the spread of data value for fair and poor response group became more loose in 2010.
 ```{r}
+#Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
 ggp_brfss_response = 
   brfss |>
   filter (year %in% c(2006,2010), locationabbr %in% c("NY")) |>
   group_by (year) |>
   ggplot(aes(x= response, y= data_value, fill = response))+
   geom_boxplot() + 
-  facet_grid(year~.)+
+  facet_grid(.~year)+
   labs(title = "Distribution of data_value for response in NY for 2006 and 2010",
        x = "Response", y = "Data_value") +
-  theme_minimal() 
+  theme_minimal()+
+  theme(legend.position = "bottom")
 ggp_brfss_response
 ```
 
@@ -192,8 +194,8 @@ accelerometer_df =
   janitor::clean_names()|>
   pivot_longer(
     cols = starts_with("min"),
-               names_to = "Minute",
-               values_to = "Minute_value")
+               names_to = "minute",
+               values_to = "minute_value")
 view(accelerometer_df)
 ```
 ## Merge data
@@ -233,7 +235,7 @@ demographic_df |>
 total_activity_df = 
   demo_accel_df|>
   group_by(seqn)|>
-  summarize(total_activity=sum(Minute_value))|>
+  summarize(total_activity=sum(minute_value))|>
   inner_join(demographic_df, by = "seqn")
 view(total_activity_df)
 ```
@@ -249,5 +251,19 @@ total_activity_df|>
        y = "Total Activity",
        color = "Sex")+
   theme(legend.position = "bottom")
+```
+
+```{r}
+#A three-panel plot that shows the 24-hour activity time courses for each education level and use color to indicate sex
+demo_accel_df |>
+  ggplot( aes(x = minute, y = minute_value, color = sex)) +
+  geom_point() +
+  geom_smooth() +
+  facet_grid(.~education)+
+  labs(title = "24-hour activity time courses by education level",
+       x = "Minute",
+       y = "Activity Level",
+       color = "Sex")
+
 ```
 

@@ -189,7 +189,11 @@ view(demographic_df)
 
 accelerometer_df = 
   accelerometer_df|>
-  janitor::clean_names()
+  janitor::clean_names()|>
+  pivot_longer(
+    cols = starts_with("min"),
+               names_to = "Minute",
+               values_to = "Minute_value")
 view(accelerometer_df)
 ```
 ## Merge data
@@ -202,7 +206,7 @@ view(demo_accel_df)
 ##Comment: From the table, in both "Less than high school" and "More than high school" groups, numbers of females are more than number of males; while in "High school equivalent", there are more males than females. Most of the females and males have pursued education in high school or beyond high school.
 ```{r}
 #Table for the number of men and women in each education category
-demo_accel_df |>
+demographic_df |>
   group_by(sex, education)|>
   summarise(count_education = n())|>
   pivot_wider(
@@ -214,7 +218,7 @@ demo_accel_df |>
 ##Comment: From the boxplot, for both "less than high school" and "More than high school", the distribution of age for female and male are very similar while in these two education category, the spreads of the middle half of the age distribution for female are more concentrated than the the spreads of the middle half of the age distribution for male(IQR for "less than high school" falls between 45-70; IQR for "More than high school" falls between 30-60). In the "High school equivalent" education category, the median of the age for male which is around 55 is much smaller than the median of the age for females which is around 62. In this categrory, the IQR of age distribution for female falls between 45-75; the IQR of age distribution for male falls between 35-65.
 ```{r}
 #Plot showing distributions of age for men and women in each education category
-demo_accel_df |>
+demographic_df |>
   ggplot(aes(x= sex , y= age, fill = education))+
   geom_boxplot() +
   facet_grid(.~education)+
@@ -224,4 +228,26 @@ demo_accel_df |>
   theme(legend.position = "bottom")
 ```
 
+```{r}
+# Dataframe for total activity
+total_activity_df = 
+  demo_accel_df|>
+  group_by(seqn)|>
+  summarize(total_activity=sum(Minute_value))|>
+  inner_join(demographic_df, by = "seqn")
+view(total_activity_df)
+```
+## Comment:For both female and male in "Less than high school" education category, their highest total activity was achieved in early 20s. For people in "High school equivalent" education category, their highest total activity was achieved around 40. For malas in "More than high school" education category, their total activity level did not fluctuate a lot from 20 to 50; for females, their total activity level did not fluctuate a lot from 20 to 60.In generall, females and males with same education category seem to have very similar tatal activity flucatuation patterns along ages.
+```{r}
+total_activity_df|>
+  ggplot(aes(x=age, y=total_activity, color=sex))+
+  geom_point()+
+  geom_smooth()+
+  facet_grid(.~education)+
+  labs(title = "Total activity against age in different education levels for females and mals",
+       x = "Age",
+       y = "Total Activity",
+       color = "Sex")+
+  theme(legend.position = "bottom")
+```
 
